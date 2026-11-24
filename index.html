@@ -170,21 +170,24 @@
 
 <script>
 const SONGS = [
-  { title: "All I Want for Christmas Is You", note: "앞부분", file: "All I Want for Christmas Is You 전번부.aac", icon: "🎁" },
-  { title: "All I Want for Christmas Is You", note: "전곡", file: "All I Want for Christmas Is You.aac", icon: "🎄" },
-  { title: "Christmas (Baby Please Come Home)", note: "", file: "Christmas (Baby Please Come Home).aac", icon: "🔔" },
-  { title: "Gifts for Me", note: "", file: "gifts for me.aac", icon: "🎀" },
-  { title: "Last Christmas", note: "", file: "Last Christmas.aac", icon: "⛄" },
-  { title: "Thank You Note", note: "", file: "Thank you Note.aac", icon: "💌" },
-  { title: "종소리 울려", note: "", file: "종소리울려.aac", icon: "🛷" }
+  { title: "All I Want for Christmas Is You", note: "앞부분", file: "All I Want for Christmas Is You 전번부.aac", icon: "🎁", drive: "1AKIszmmUQvmi58z43VQsac5JxGp6ta15" },
+  { title: "All I Want for Christmas Is You", note: "전곡", file: "All I Want for Christmas Is You.aac", icon: "🎄", drive: "1DJ2RXi71yXYmLPsYRsUBCnpBoY9ZCFjV" },
+  { title: "Christmas (Baby Please Come Home)", note: "", file: "Christmas (Baby Please Come Home).aac", icon: "🔔", drive: "1G7AzUGLoeV7ZhfJnPH9pjdN-0LKK3_0d" },
+  { title: "Gifts for Me", note: "", file: "gifts for me.aac", icon: "🎀", drive: "1hdUDh_fhyzRxZowOXoHKUr3X3fNmrVsn" },
+  { title: "Last Christmas", note: "", file: "Last Christmas.aac", icon: "⛄", drive: "1GUMy3nqxm-uvHP7NxnwsychV3GTEm9yc" },
+  { title: "Thank You Note", note: "", file: "Thank you Note.aac", icon: "💌", drive: "12tHu1B97orQdiP4iucik_0a6CRW5hSJw" },
+  { title: "종소리 울려", note: "", file: "종소리울려.aac", icon: "🛷", drive: "1711orj0tFMl2vog_QQCWPWx-pj5nGQLM" }
 ];
+// 내 컴퓨터에서 열면 music 폴더, 인터넷(QR)으로 열면 구글 드라이브에서 불러온다
+const ONLINE = location.protocol.startsWith("http");
+const driveUrl = id => "https://drive.usercontent.google.com/download?id=" + id + "&export=download&confirm=t";
 
 const list = document.getElementById("songs");
 const fmt = s => isFinite(s) ? Math.floor(s/60) + ":" + String(Math.floor(s%60)).padStart(2,"0") : "0:00";
 let current = null;
 
 SONGS.forEach(song => {
-  const src = "music/" + encodeURIComponent(song.file);
+  const src = ONLINE ? driveUrl(song.drive) : "music/" + encodeURIComponent(song.file);
   const el = document.createElement("div");
   el.className = "song";
   el.innerHTML = `
@@ -216,9 +219,12 @@ SONGS.forEach(song => {
   audio.addEventListener("pause", setIdle);
   audio.addEventListener("ended", () => { setIdle(); audio.currentTime = 0; fill.style.width = "0"; });
   audio.addEventListener("error", () => {
-    el.querySelector(".btns").outerHTML = '<div class="off">🔈 이 곡은 선생님 화면에서 들려드려요</div>';
-    el.querySelector(".bar").style.display = "none";
-    el.querySelector(".time-row").style.display = "none";
+    // 바로 재생이 안 되면 구글 드라이브 재생 화면으로 연결
+    const a = document.createElement("a");
+    a.className = "btn play"; a.target = "_blank"; a.rel = "noopener";
+    a.href = "https://drive.google.com/file/d/" + song.drive + "/view";
+    a.textContent = "▶ 미리듣기";
+    btn.replaceWith(a);
   });
 
   btn.addEventListener("click", () => {
