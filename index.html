@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>크리스마스 카드 만들기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fbf7f0; --paper:#ffffff; --ink:#2b2420; --muted:#7a6e65;
+    --red:#c8372d; --red-soft:#fbe6e3; --green:#1f6b4a; --green-soft:#e2f1e9;
+    --gold:#d9a441; --line:#eadfd2;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans KR",sans-serif;line-height:1.7}
+  .wrap{max-width:960px;margin:0 auto;padding:0 16px 80px}
+
+  header.hero{background:linear-gradient(135deg,#1f6b4a 0%,#14492f 100%);color:#fff;padding:64px 16px 72px;text-align:center;position:relative;overflow:hidden}
+  .hero .snow{position:absolute;inset:0;pointer-events:none;
+    background-image:radial-gradient(#fff 1.2px,transparent 1.6px),radial-gradient(#fff 1px,transparent 1.4px);
+    background-size:60px 60px,37px 37px;background-position:0 0,18px 22px;opacity:.25}
+  .hero .tag{display:inline-block;background:var(--gold);color:#2b2420;font-weight:700;font-size:14px;padding:4px 14px;border-radius:99px}
+  .hero h1{font-family:"Gowun Dodum",sans-serif;font-size:clamp(36px,7vw,60px);margin:18px 0 8px;letter-spacing:-1px}
+  .hero p{margin:0;opacity:.9;font-size:18px}
+  .hero .qr{position:relative;margin:28px auto 0;display:inline-flex;flex-direction:column;align-items:center;gap:10px;background:#fff;color:var(--ink);padding:14px 14px 12px;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+  .hero .qr img{width:160px;height:160px;display:block}
+  .hero .qr span{font-size:14px;font-weight:700}
+  .song .off{font-size:14px;color:var(--muted);background:var(--bg);border-radius:10px;padding:10px;text-align:center}
+
+  section{margin-top:48px}
+  h2{font-size:24px;font-weight:900;margin:0 0 16px;display:flex;align-items:center;gap:10px}
+  h2 .num{background:var(--red);color:#fff;width:34px;height:34px;border-radius:50%;display:inline-grid;place-items:center;font-size:16px}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:24px}
+
+  ol.goals{margin:0;padding-left:22px}
+  ol.goals li{margin:6px 0;font-size:17px}
+
+  .flow{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .flow .step{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:20px;border-top:6px solid var(--green)}
+  .flow .step:nth-child(2){border-top-color:var(--red)}
+  .flow .step:nth-child(3){border-top-color:var(--gold)}
+  .flow .step b{font-size:18px}
+  .flow .step .time{color:var(--muted);font-size:14px}
+  .flow ul{margin:8px 0 0;padding-left:18px}
+
+  .songs{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .song{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px;transition:box-shadow .2s,border-color .2s}
+  .song.playing{border-color:var(--red);box-shadow:0 0 0 3px var(--red-soft)}
+  .song .top{display:flex;gap:14px;align-items:center}
+  .song .icon{flex:0 0 52px;height:52px;border-radius:12px;background:var(--green-soft);display:grid;place-items:center;font-size:26px}
+  .song.playing .icon{background:var(--red-soft)}
+  .song .title{font-weight:700;font-size:17px;line-height:1.35}
+  .song .meta{color:var(--muted);font-size:13px}
+  .bar{height:6px;background:var(--line);border-radius:99px;overflow:hidden;cursor:pointer}
+  .bar i{display:block;height:100%;width:0;background:var(--red)}
+  .time-row{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:-6px}
+  .btns{display:flex;gap:8px}
+  .btn{flex:1;border:0;border-radius:10px;padding:11px 10px;font:inherit;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;text-align:center;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+  .btn.play{background:var(--red);color:#fff}
+  .btn.play:hover{background:#a92c23}
+  .btn.down{background:var(--green-soft);color:var(--green)}
+  .btn.down:hover{background:#cde7d9}
+
+  .steps{counter-reset:s;list-style:none;margin:0;padding:0}
+  .steps li{counter-increment:s;position:relative;padding:14px 16px 14px 60px;border-bottom:1px dashed var(--line)}
+  .steps li:last-child{border-bottom:0}
+  .steps li::before{content:counter(s);position:absolute;left:14px;top:14px;width:32px;height:32px;border-radius:50%;background:var(--gold);color:#2b2420;font-weight:900;display:grid;place-items:center}
+  .tip{background:var(--red-soft);border-radius:12px;padding:14px 18px;margin-top:16px;font-size:15px}
+  .check{list-style:none;padding:0;margin:0}
+  .check li{padding:6px 0 6px 30px;position:relative}
+  .check li::before{content:"☐";position:absolute;left:0;color:var(--green);font-size:18px}
+  footer{text-align:center;color:var(--muted);font-size:14px;margin-top:56px}
+
+  @media (max-width:700px){
+    .flow,.songs{grid-template-columns:1fr}
+    .hero p{font-size:16px}
+  }
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="snow"></div>
+  <span class="tag">🎄 크리스마스 특강</span>
+  <h1>크리스마스 카드 만들기</h1>
+  <p>마음을 담은 글과 그림, 그리고 어울리는 음악으로 나만의 카드를 완성해요</p>
+  <div class="qr">
+    <img src="qr.png" alt="교안 주소 QR 코드">
+    <span>📱 휴대폰으로 찍으면 교안이 열려요</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section>
+    <h2><span class="num">1</span>학습 목표</h2>
+    <div class="card">
+      <ol class="goals">
+        <li>카드를 받을 사람 1명을 정하고, 전하고 싶은 마음을 담은 인사말을 3문장 이상 쓸 수 있다.</li>
+        <li>제시된 크리스마스 음악 7곡을 미리 듣고, 카드 분위기에 어울리는 배경음악 1곡을 선택할 수 있다.</li>
+        <li>크리스마스 상징(트리, 눈사람, 선물, 별 등) 가운데 2가지 이상을 골라 카드 앞면을 그릴 수 있다.</li>
+        <li>인사말, 그림, 배경음악을 하나로 묶어 완성한 카드를 짝과 바꿔 보고, 마음에 드는 부분을 1가지 이상 식별할 수 있다.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">2</span>수업 흐름</h2>
+    <div class="flow">
+      <div class="step">
+        <b>도입</b> <span class="time">· 10분</span>
+        <ul>
+          <li>크리스마스 음악 한 곡 함께 듣기</li>
+          <li>카드를 받고 싶은 사람, 주고 싶은 사람 떠올리기</li>
+        </ul>
+      </div>
+      <div class="step">
+        <b>전개</b> <span class="time">· 30분</span>
+        <ul>
+          <li>배경음악 미리 듣고 고르기</li>
+          <li>인사말 쓰기</li>
+          <li>카드 앞면 꾸미기</li>
+        </ul>
+      </div>
+      <div class="step">
+        <b>정리</b> <span class="time">· 10분</span>
+        <ul>
+          <li>음악과 함께 카드 발표하기</li>
+          <li>짝의 카드에서 좋은 점 말해 주기</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">3</span>배경음악 고르기</h2>
+    <p style="margin:-6px 0 16px;color:var(--muted)">▶ 미리듣기를 눌러 들어 보고, 마음에 드는 곡은 ⬇ 다운로드를 눌러 저장하세요.</p>
+    <div class="songs" id="songs"></div>
+  </section>
+
+  <section>
+    <h2><span class="num">4</span>카드 만들기 순서</h2>
+    <div class="card">
+      <ol class="steps">
+        <li><b>받는 사람 정하기</b><br>가족, 친구, 선생님 등 카드를 줄 사람 1명을 정해요.</li>
+        <li><b>인사말 쓰기</b><br>"고마웠던 일 → 함께하고 싶은 일 → 새해 바람" 순서로 3문장 이상 써요.</li>
+        <li><b>앞면 그리기</b><br>트리, 눈사람, 선물, 별, 종 가운데 2가지 이상을 골라 그려요.</li>
+        <li><b>배경음악 정하기</b><br>위 목록에서 카드 분위기와 어울리는 곡을 골라 다운로드해요.</li>
+        <li><b>완성하고 나누기</b><br>고른 음악을 틀어 놓고 카드를 읽어 주며 짝과 바꿔 봐요.</li>
+      </ol>
+      <div class="tip">💡 <b>음악 고르는 요령</b> — 신나는 카드는 빠른 곡, 고마움을 전하는 카드는 잔잔한 곡이 잘 어울려요.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">5</span>마무리 확인</h2>
+    <div class="card">
+      <ul class="check">
+        <li>받는 사람을 정했나요?</li>
+        <li>인사말을 3문장 이상 썼나요?</li>
+        <li>크리스마스 그림을 2가지 이상 그렸나요?</li>
+        <li>카드에 어울리는 배경음악을 골랐나요?</li>
+        <li>짝의 카드에서 좋은 점을 1가지 이상 찾았나요?</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>🎅 메리 크리스마스! 따뜻한 마음을 전해 보세요.</footer>
+</div>
+
+<script>
+const SONGS = [
+  { title: "All I Want for Christmas Is You", note: "앞부분", file: "All I Want for Christmas Is You 전번부.aac", icon: "🎁" },
+  { title: "All I Want for Christmas Is You", note: "전곡", file: "All I Want for Christmas Is You.aac", icon: "🎄" },
+  { title: "Christmas (Baby Please Come Home)", note: "", file: "Christmas (Baby Please Come Home).aac", icon: "🔔" },
+  { title: "Gifts for Me", note: "", file: "gifts for me.aac", icon: "🎀" },
+  { title: "Last Christmas", note: "", file: "Last Christmas.aac", icon: "⛄" },
+  { title: "Thank You Note", note: "", file: "Thank you Note.aac", icon: "💌" },
+  { title: "종소리 울려", note: "", file: "종소리울려.aac", icon: "🛷" }
+];
+
+const list = document.getElementById("songs");
+const fmt = s => isFinite(s) ? Math.floor(s/60) + ":" + String(Math.floor(s%60)).padStart(2,"0") : "0:00";
+let current = null;
+
+SONGS.forEach(song => {
+  const src = "music/" + encodeURIComponent(song.file);
+  const el = document.createElement("div");
+  el.className = "song";
+  el.innerHTML = `
+    <div class="top">
+      <div class="icon">${song.icon}</div>
+      <div>
+        <div class="title">${song.title}</div>
+        <div class="meta">${song.note ? song.note + " · " : ""}AAC 음원</div>
+      </div>
+    </div>
+    <div class="bar"><i></i></div>
+    <div class="time-row"><span class="cur">0:00</span><span class="dur">--:--</span></div>
+    <div class="btns">
+      <button class="btn play" type="button">▶ 미리듣기</button>
+      <a class="btn down" href="${src}" download="${song.file}">⬇ 다운로드</a>
+    </div>`;
+  const audio = new Audio();
+  audio.preload = "metadata";
+  audio.src = src;
+  const btn = el.querySelector(".play"), fill = el.querySelector(".bar i"),
+        cur = el.querySelector(".cur"), dur = el.querySelector(".dur");
+
+  const setIdle = () => { el.classList.remove("playing"); btn.textContent = "▶ 미리듣기"; };
+  audio.addEventListener("loadedmetadata", () => dur.textContent = fmt(audio.duration));
+  audio.addEventListener("timeupdate", () => {
+    cur.textContent = fmt(audio.currentTime);
+    if (audio.duration) fill.style.width = (audio.currentTime / audio.duration * 100) + "%";
+  });
+  audio.addEventListener("pause", setIdle);
+  audio.addEventListener("ended", () => { setIdle(); audio.currentTime = 0; fill.style.width = "0"; });
+  audio.addEventListener("error", () => {
+    el.querySelector(".btns").outerHTML = '<div class="off">🔈 이 곡은 선생님 화면에서 들려드려요</div>';
+    el.querySelector(".bar").style.display = "none";
+    el.querySelector(".time-row").style.display = "none";
+  });
+
+  btn.addEventListener("click", () => {
+    if (audio.paused) {
+      if (current && current !== audio) current.pause();
+      audio.play();
+      current = audio;
+      el.classList.add("playing");
+      btn.textContent = "⏸ 멈춤";
+    } else {
+      audio.pause();
+    }
+  });
+  el.querySelector(".bar").addEventListener("click", e => {
+    if (!audio.duration) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    audio.currentTime = (e.clientX - r.left) / r.width * audio.duration;
+  });
+  list.appendChild(el);
+});
+</script>
+</body>
+</html>
